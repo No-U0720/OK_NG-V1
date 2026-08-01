@@ -45,6 +45,10 @@ pip install numpy opencv-python pillow rembg
 
     執行後，系統將會自動開啟瀏覽器（預設為 http://localhost:5000），即可體驗拖曳上傳與即時 OK/NG 判定功能！
 
+
+---
+
+
 🚀 更多使用說明
 1. 資料夾批次檢測 (CLI 模式) 📂
 
