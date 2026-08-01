@@ -1034,7 +1034,7 @@ class WebUIHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
-def run_web_server(port=5000):
+def run_web_server(port=5001):
     server = HTTPServer(('localhost', port), WebUIHandler)
     url = f"http://localhost:{port}"
     print(f"正在啟動本機網頁伺服器...")
