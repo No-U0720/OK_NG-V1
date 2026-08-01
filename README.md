@@ -24,5 +24,5 @@
 
 ### 1. 複製專案
 ```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/No-U0720/OK_NG-V1.git)
-cd OK_NG-V1
+git clone [https://github.com/your-username/your-repo-name.git](https://github.com/No-U0720/OK_NG.git)
+cd OK_NG
