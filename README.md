@@ -78,13 +78,6 @@ RIGHT_PRONG_ROI = [1300, 800, 1400, 880]
 DARK_PIXEL_THRESHOLD = 100  # 灰階閥值
 LENGTH_THRESHOLD = 80       # 合格長度門檻 (像素 px)
 
-📂 專案結構
-Plaintext
-
-├── ok_ng.py           # 主程式 (包含影像處理、CLI 邏輯與 Web Server)
-├── README.md          # 專案說明文件
-└── results/           # 視覺化檢測結果輸出目錄 (執行後自動建立)
-
 📊 檢測結果範例輸出
 
 命令行批次掃描時的輸出格式如下：
