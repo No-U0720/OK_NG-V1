@@ -1033,12 +1033,26 @@ class WebUIHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
 def run_web_server(port=5001):
-    server = HTTPServer(('localhost', port), WebUIHandler)
-    url = f"http://localhost:{port}"
-    print(f"正在啟動本機網頁伺服器...")
-    print(f"請在瀏覽器中打開此網址：{url}")
+    import socket
+    local_ip = "localhost"
+    try:
+        # Get actual local IP address on the network
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
+        
+    server = HTTPServer(('0.0.0.0', port), WebUIHandler)
+    url_local = f"http://localhost:{port}"
+    url_network = f"http://{local_ip}:{port}"
+    
+    print(f"正在啟動本機網頁伺服器（已開放所有網路介面）...")
+    print(f"本機存取網址：{url_local}")
+    print(f"同網域（其他人）存取網址：{url_network}")
     print("按下 Ctrl+C 可停止伺服器。")
-    webbrowser.open(url)
+    webbrowser.open(url_local)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
