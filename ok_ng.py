@@ -242,279 +242,559 @@ HTML_PAGE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>接腳長度自動檢測系統 (OK/NG)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>VKD Defect Detection System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(20, 26, 46, 0.6);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-color: #3b82f6;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --text-color: #f3f4f6;
+            --bg-color: #f4f6f9;
+            --header-bg: #ffffff;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --accent-blue: #1e40af;
+            --accent-light-blue: #3b82f6;
+            --success-color: #2ca02c;
+            --danger-color: #d62728;
+            --border-color: #dddddd;
+            --dark-terminal-bg: #0c0f1d;
+            --teal-highlight: #00bcd4;
         }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .system-header {
+            background-color: var(--header-bg);
+            border-bottom: 3px solid var(--accent-blue);
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            padding: 2rem;
-            overflow-x: hidden;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeInDown 0.6s ease-out;
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        header h1 {
-            font-size: 2.5rem;
+
+        .logo-placeholder {
+            font-weight: 900;
+            font-size: 24px;
+            color: #0f172a;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-placeholder span {
+            color: #ef4444;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1.5px solid #ef4444;
+            padding: 1px 3px;
+            margin-left: 5px;
+            border-radius: 3px;
+        }
+
+        .header-title {
+            font-size: 26px;
             font-weight: 800;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-        header p {
-            color: #9ca3af;
-            font-size: 1rem;
-        }
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            animation: fadeInUp 0.8s ease-out;
-        }
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
-        }
-        .dropzone {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 4rem 2rem;
+            color: var(--accent-blue);
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.02);
             flex-grow: 1;
         }
-        .dropzone:hover, .dropzone.dragover {
-            border-color: var(--accent-color);
-            background: rgba(59, 130, 246, 0.05);
+
+        .header-right {
+            font-size: 14px;
+            color: #666666;
+            font-weight: 700;
         }
-        .dropzone svg {
-            width: 64px;
-            height: 64px;
-            fill: #9ca3af;
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease;
+
+        /* Dashboard Layout */
+        .main-dashboard {
+            display: grid;
+            grid-template-columns: 1.1fr 1.1fr 0.8fr;
+            gap: 15px;
+            flex-grow: 1;
         }
-        .dropzone:hover svg {
-            transform: scale(1.1);
-            fill: var(--accent-color);
-        }
-        .dropzone p {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-        .dropzone span {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-        #file-input {
-            display: none;
-        }
-        .result-panel {
+
+        .column-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            min-height: 400px;
-            border-radius: 16px;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        /* Left Column: Live stream */
+        .live-feed-box {
+            background-color: #000;
+            border: 3px solid #10b981;
+            border-radius: 6px;
             position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        #result-img {
-            max-width: 100%;
-            max-height: 500px;
+
+        .live-meta-bar {
+            background-color: #111827;
+            display: flex;
+            justify-content: space-around;
+            padding: 4px;
+            font-size: 11px;
+            color: #ffffff;
+            font-weight: 700;
+            border-bottom: 1px solid #374151;
+        }
+
+        .meta-item span {
+            color: var(--teal-highlight);
+        }
+
+        .live-image-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1f2937;
+        }
+
+        .live-image-container img {
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            display: none;
         }
-        .placeholder-text {
-            color: #6b7280;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-        .status-badge {
+
+        .live-overlay-feed {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: none;
+            top: 8px;
+            left: 8px;
+            background-color: rgba(0,0,0,0.6);
+            color: #ffffff;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        .status-badge.ok {
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #ff4d4d;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1s infinite;
+        }
+
+        .live-overlay-device {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0,0,0,0.6);
+            color: #cccccc;
+            padding: 2px 6px;
+            font-size: 9px;
+        }
+
+        /* OK/NG Badges */
+        .result-overlay-badge {
+            position: absolute;
+            top: 15%;
+            right: 5%;
+            padding: 5px 15px;
+            font-weight: 900;
+            font-size: 24px;
+            border-radius: 4px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .badge-ok {
             background-color: var(--success-color);
             color: white;
         }
-        .status-badge.ng {
+
+        .badge-ng {
             background-color: var(--danger-color);
             color: white;
         }
-        .stats {
-            margin-top: 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+
+        /* Controls under Live stream */
+        .live-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 0 5px;
+        }
+
+        .toggle-mode {
+            font-size: 14px;
+            font-weight: 700;
+            color: #d62728;
+        }
+
+        .toggle-mode span {
+            color: #333333;
+            margin-left: 10px;
+        }
+
+        .btn-capture {
+            background-color: #3b82f6;
+            color: #ffffff;
+            border: none;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-capture:hover {
+            background-color: #2563eb;
+        }
+
+        /* Middle Column: Results */
+        .result-view-box {
+            background-color: #000;
+            border: 3px solid #10b981;
+            border-radius: 6px;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1f2937;
+            position: relative;
+        }
+
+        .result-view-box img {
             width: 100%;
-            display: none;
+            height: 100%;
+            object-fit: contain;
         }
-        .stat-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
+
+        .result-info-box {
+            margin-top: 10px;
+            display: flex;
+            gap: 15px;
         }
-        .stat-card h3 {
-            font-size: 0.9rem;
-            color: #9ca3af;
-            margin-bottom: 0.5rem;
+
+        .result-text-summary {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111827;
+            flex-grow: 1;
         }
-        .stat-card p {
-            font-size: 1.5rem;
+
+        .result-status-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .config-red-table {
+            background-color: #000000;
+            color: #ff3b30;
+            border: 1px solid #333;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 11px;
+            line-height: 1.4;
+            min-width: 150px;
+        }
+
+        .config-label-arrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #d62728;
+        }
+
+        .config-arrow {
+            font-size: 20px;
+        }
+
+        /* Right Column: History */
+        .history-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .history-play-btn {
+            font-size: 12px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #475569;
             font-weight: 700;
         }
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid var(--accent-color);
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: none;
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex-grow: 1;
+            max-height: 380px;
+            padding-right: 2px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .history-item {
+            display: flex;
+            border: 2px solid #94a3b8;
+            border-radius: 4px;
+            background-color: #f8fafc;
+            cursor: pointer;
+            overflow: hidden;
+            height: 70px;
+            position: relative;
         }
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .history-item.ok-border {
+            border-color: var(--success-color);
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .history-item.ng-border {
+            border-color: var(--danger-color);
+        }
+
+        .history-item-num {
+            width: 30px;
+            background-color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 12px;
+            border-right: 1px solid #cbd5e1;
+        }
+
+        .history-item-thumb {
+            flex-grow: 1;
+            height: 100%;
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .history-item-thumb img {
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+        }
+
+        .history-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 1px 4px;
+            border-radius: 2px;
+            color: #fff;
+        }
+
+        /* Bottom Row: Terminal Logs */
+        .system-log-section {
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+
+        .terminal-box {
+            background-color: var(--dark-terminal-bg);
+            color: #38bdf8;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            height: 120px;
+            overflow-y: auto;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+
+        .terminal-time {
+            color: #a3e635;
+        }
+
+        .terminal-post {
+            color: #f472b6;
+        }
+
+        .terminal-elapsed {
+            color: #fb923c;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
+        .empty-placeholder {
+            color: #94a3b8;
+            font-size: 14px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>接腳長度自動檢測系統</h1>
-        <p>上傳或拖曳圖片，即時判定 OK / NG 並畫記量測原因</p>
+    <!-- Hidden File Input -->
+    <input type="file" id="file-input" accept="image/*" style="display: none;">
+
+    <header class="system-header">
+        <div class="header-left">
+            <div class="logo-placeholder">VKD <span>KING DUAN</span></div>
+        </div>
+        <div class="header-title">VKD Defect Detection System</div>
+        <div class="header-right">Ver 1.0 20260710</div>
     </header>
 
-    <div class="container">
-        <div class="card">
-            <div class="dropzone" id="dropzone">
-                <svg viewBox="0 0 24 24">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-                </svg>
-                <p>點擊上傳 或 拖曳圖片至此處</p>
-                <span>支援格式: JPG, JPEG, PNG</span>
-                <input type="file" id="file-input" accept="image/*">
+    <main class="main-dashboard">
+        <!-- Column 1: Live stream -->
+        <section class="column-panel">
+            <h2 class="panel-title">Live stream</h2>
+            <div class="live-feed-box">
+                <div class="live-meta-bar">
+                    <div class="meta-item">客戶名稱: <span>KB</span></div>
+                    <div class="meta-item">目前產品: <span>020-001</span></div>
+                    <div class="meta-item">良率: <span id="yield-rate">99.9%</span></div>
+                    <div class="meta-item">站別: <span>01</span></div>
+                </div>
+                <div class="live-image-container">
+                    <div class="live-overlay-feed"><span class="live-dot"></span> LIVE FEED</div>
+                    <div class="live-overlay-device">Device: UVC Camera 0</div>
+                    <div class="result-overlay-badge badge-ok" id="live-badge" style="display: none;">OK</div>
+                    <img id="live-img" style="display: none;">
+                    <div class="empty-placeholder" id="live-placeholder">等待相機影像擷取...</div>
+                </div>
             </div>
-        </div>
+            <div class="live-controls">
+                <div class="toggle-mode">自動檢測 (V) <span>手動檢測</span></div>
+                <button class="btn-capture" id="btn-capture">
+                    📷 擷取
+                </button>
+            </div>
+        </section>
 
-        <div class="card">
-            <div class="result-panel">
-                <div class="loader" id="loader"></div>
-                <div class="placeholder-text" id="placeholder">等待上傳圖片...</div>
-                <img id="result-img" alt="偵測結果影像">
-                <div class="status-badge" id="badge"></div>
+        <!-- Column 2: Latest Result Image -->
+        <section class="column-panel">
+            <h2 class="panel-title">Latest Inspection Result Image</h2>
+            <div class="result-view-box">
+                <img id="result-img" style="display: none;">
+                <div class="empty-placeholder" id="result-placeholder">等待量測影像輸出...</div>
             </div>
-            
-            <div class="stats" id="stats">
-                <div class="stat-card">
-                    <h3>左接腳量測面積</h3>
-                    <p id="left-area-val">-</p>
+            <div class="result-info-box">
+                <div class="result-text-summary">
+                    <div class="result-status-title" id="result-status-text">請上傳影像進行檢測</div>
+                    <div style="font-size: 11px; color: #666;" id="result-timestamp">---</div>
                 </div>
-                <div class="stat-card">
-                    <h3>右接腳量測面積</h3>
-                    <p id="right-area-val">-</p>
+                <div class="config-label-arrow">
+                    <div class="config-red-table">
+                        左側長度: <span id="val-left-len">--</span> px<br>
+                        右側長度: <span id="val-right-len">--</span> px<br>
+                        設定門檻: 80.00 px<br>
+                        量測狀態: <span id="val-status">--</span>
+                    </div>
+                    <div class="config-arrow">⬅</div>
+                    <div style="font-size: 11px;">瑕疵檢測<br>設定值</div>
                 </div>
             </div>
+        </section>
+
+        <!-- Column 3: History -->
+        <section class="column-panel">
+            <h2 class="panel-title">History 預設5個</h2>
+            <div class="history-controls">
+                <button class="history-play-btn">▶ PLAY</button>
+                <div style="font-size: 14px; font-weight: 700; color: #475569;">+</div>
+            </div>
+            <div class="history-list" id="history-list">
+                <!-- Prepopulated or dynamically added items -->
+                <div class="empty-placeholder" style="margin-top: 50px;">尚無檢測紀錄</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Row: System Log -->
+    <footer class="system-log-section">
+        <h2 class="panel-title" style="font-size: 16px;">系統日誌</h2>
+        <div class="terminal-box" id="terminal-box">
+            <div>VKD Defect Detection System initialized. Ready for inspection.</div>
         </div>
-    </div>
+    </footer>
 
     <script>
-        const dropzone = document.getElementById('dropzone');
+        const btnCapture = document.getElementById('btn-capture');
         const fileInput = document.getElementById('file-input');
-        const loader = document.getElementById('loader');
-        const placeholder = document.getElementById('placeholder');
+        
+        const liveImg = document.getElementById('live-img');
+        const livePlaceholder = document.getElementById('live-placeholder');
+        const liveBadge = document.getElementById('live-badge');
+        
         const resultImg = document.getElementById('result-img');
-        const badge = document.getElementById('badge');
-        const stats = document.getElementById('stats');
-        const leftAreaVal = document.getElementById('left-area-val');
-        const rightAreaVal = document.getElementById('right-area-val');
+        const resultPlaceholder = document.getElementById('result-placeholder');
+        const resultStatusText = document.getElementById('result-status-text');
+        const resultTimestamp = document.getElementById('result-timestamp');
+        
+        const valLeftLen = document.getElementById('val-left-len');
+        const valRightLen = document.getElementById('val-right-len');
+        const valStatus = document.getElementById('val-status');
+        const yieldRateSpan = document.getElementById('yield-rate');
+        
+        const historyList = document.getElementById('history-list');
+        const terminalBox = document.getElementById('terminal-box');
 
-        dropzone.addEventListener('click', () => fileInput.click());
+        let historyItems = [];
+        let totalCount = 0;
+        let okCount = 0;
 
-        dropzone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropzone.classList.add('dragover');
-        });
-
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.classList.remove('dragover');
-        });
-
-        dropzone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropzone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        });
+        btnCapture.addEventListener('click', () => fileInput.click());
 
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
@@ -522,16 +802,53 @@ HTML_PAGE = """
             }
         });
 
+        // Add drag & drop support to live feed area
+        const liveFeedBox = document.querySelector('.live-feed-box');
+        liveFeedBox.addEventListener('dragover', (e) => e.preventDefault());
+        liveFeedBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        });
+
+        // Write log entry to terminal
+        function logToTerminal(message, isRequest = false, elapsed = null) {
+            const div = document.createElement('div');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            
+            if (isRequest) {
+                div.innerHTML = `<span class="terminal-time">[${timeStr}]</span> <span class="terminal-post">POST /upload</span> HTTP/1.1 200 OK`;
+                if (elapsed !== null) {
+                    const elapsedDiv = document.createElement('div');
+                    elapsedDiv.innerHTML = `&nbsp;&nbsp;辨識耗時: <span class="terminal-elapsed">${elapsed.toFixed(2)} 秒</span>`;
+                    terminalBox.appendChild(div);
+                    terminalBox.appendChild(elapsedDiv);
+                } else {
+                    terminalBox.appendChild(div);
+                }
+            } else {
+                div.innerHTML = `<span class="terminal-time">[${timeStr}]</span> ${message}`;
+                terminalBox.appendChild(div);
+            }
+            terminalBox.scrollTop = terminalBox.scrollHeight;
+        }
+
         async function processFile(file) {
-            // Show loader
-            placeholder.style.display = 'none';
-            resultImg.style.display = 'none';
-            badge.style.display = 'none';
-            stats.style.display = 'none';
-            loader.style.display = 'block';
+            // Show original image in live stream view
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                liveImg.src = e.target.result;
+                liveImg.style.display = 'block';
+                livePlaceholder.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+
+            logToTerminal(`Uploading and capturing file: ${file.name}...`);
 
             try {
-                // Send raw binary to avoid complex multipart parser on python side
                 const response = await fetch(`/upload?filename=${encodeURIComponent(file.name)}`, {
                     method: 'POST',
                     body: file
@@ -542,30 +859,115 @@ HTML_PAGE = """
                 }
 
                 const result = await response.json();
-                
-                // Set result image (source is base64 formatted png)
+                const now = new Date();
+                const formattedTime = now.getFullYear() + '-' + 
+                                      String(now.getMonth()+1).padStart(2, '0') + '-' + 
+                                      String(now.getDate()).padStart(2, '0') + ' ' + 
+                                      String(now.getHours()).padStart(2, '0') + ':' + 
+                                      String(now.getMinutes()).padStart(2, '0');
+
+                // Update Result Image view
                 resultImg.src = `data:image/png;base64,${result.image_base64}`;
                 resultImg.style.display = 'block';
+                resultPlaceholder.style.display = 'none';
 
-                // Set badge
-                badge.innerText = result.status;
-                badge.className = `status-badge ${result.status.toLowerCase()}`;
-                badge.style.display = 'block';
+                // Update Live view Badge
+                liveBadge.innerText = result.status;
+                liveBadge.className = `result-overlay-badge ${result.status === 'OK' ? 'badge-ok' : 'badge-ng'}`;
+                liveBadge.style.display = 'block';
 
-                // Set stats
-                leftAreaVal.innerText = `${result.left_area} px`;
-                leftAreaVal.style.color = result.left_ok ? 'var(--success-color)' : 'var(--danger-color)';
-                rightAreaVal.innerText = `${result.right_area} px`;
-                rightAreaVal.style.color = result.right_ok ? 'var(--success-color)' : 'var(--danger-color)';
-                stats.style.display = 'grid';
+                // Update info panels
+                resultStatusText.innerText = result.status === 'OK' ? `${formattedTime} Passed` : `${formattedTime} Failed`;
+                resultStatusText.style.color = result.status === 'OK' ? 'var(--success-color)' : 'var(--danger-color)';
+                resultTimestamp.innerText = `影像名稱: ${file.name}`;
+
+                valLeftLen.innerText = result.left_len;
+                valRightLen.innerText = result.right_len;
+                valStatus.innerText = result.status === 'OK' ? 'Passed' : 'Failed';
+                valStatus.style.color = result.status === 'OK' ? 'var(--success-color)' : 'var(--danger-color)';
+
+                // Update stats & yield rate
+                totalCount++;
+                if (result.status === 'OK') okCount++;
+                const yieldRate = ((okCount / totalCount) * 100).toFixed(1);
+                yieldRateSpan.innerText = `${yieldRate}%`;
+
+                // Log to terminal
+                logToTerminal(null, true, result.elapsed);
+                logToTerminal(`檢測結果: ${result.status} (左接腳: ${result.left_len} px, 右接腳: ${result.right_len} px)`);
+
+                // Append to history list
+                addHistoryItem(file.name, liveImg.src, resultImg.src, result);
 
             } catch (error) {
+                logToTerminal(`錯誤: ${error.message}`);
                 alert('處理失敗：' + error.message);
-                placeholder.style.display = 'block';
-                placeholder.innerText = '發生錯誤，請重新上傳';
-            } finally {
-                loader.style.display = 'none';
             }
+        }
+
+        function addHistoryItem(name, origSrc, resultSrc, result) {
+            // Keep maximum 5 items in list
+            if (historyItems.length >= 5) {
+                historyItems.pop();
+            }
+
+            const item = {
+                id: ++totalCount,
+                name: name,
+                origSrc: origSrc,
+                resultSrc: resultSrc,
+                result: result,
+                time: new Date().toLocaleTimeString()
+            };
+
+            historyItems.unshift(item);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (historyItems.length === 0) {
+                historyList.innerHTML = `<div class="empty-placeholder" style="margin-top: 50px;">尚無檢測紀錄</div>`;
+                return;
+            }
+
+            historyItems.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = `history-item ${item.result.status === 'OK' ? 'ok-border' : 'ng-border'}`;
+                div.innerHTML = `
+                    <div class="history-item-num">${item.id}</div>
+                    <div class="history-item-thumb">
+                        <img src="${item.resultSrc}">
+                    </div>
+                    <div class="history-badge ${item.result.status === 'OK' ? 'badge-ok' : 'badge-ng'}">${item.result.status}</div>
+                `;
+                
+                // Clicking history item restores it on panels
+                div.addEventListener('click', () => {
+                    liveImg.src = item.origSrc;
+                    liveImg.style.display = 'block';
+                    livePlaceholder.style.display = 'none';
+
+                    liveBadge.innerText = item.result.status;
+                    liveBadge.className = `result-overlay-badge ${item.result.status === 'OK' ? 'badge-ok' : 'badge-ng'}`;
+                    liveBadge.style.display = 'block';
+
+                    resultImg.src = item.resultSrc;
+                    resultImg.style.display = 'block';
+                    resultPlaceholder.style.display = 'none';
+
+                    resultStatusText.innerText = item.result.status === 'OK' ? `History Passed` : `History Failed`;
+                    resultStatusText.style.color = item.result.status === 'OK' ? 'var(--success-color)' : 'var(--danger-color)';
+                    resultTimestamp.innerText = `影像名稱: ${item.name} (${item.time})`;
+
+                    valLeftLen.innerText = item.result.left_len;
+                    valRightLen.innerText = item.result.right_len;
+                    valStatus.innerText = item.result.status === 'OK' ? 'Passed' : 'Failed';
+                    valStatus.style.color = item.result.status === 'OK' ? 'var(--success-color)' : 'var(--danger-color)';
+                });
+
+                historyList.appendChild(div);
+            });
         }
     </script>
 </body>
@@ -599,9 +1001,11 @@ class WebUIHandler(BaseHTTPRequestHandler):
             # Read raw image bytes
             image_bytes = self.rfile.read(content_length)
             
-            # Check image
+            import time
             import base64
+            start_time = time.time()
             res = check_image(image_bytes, filename="web_upload.png")
+            elapsed = time.time() - start_time
             
             if res:
                 # Add base64 representation of the processed image to return in JSON
@@ -611,9 +1015,12 @@ class WebUIHandler(BaseHTTPRequestHandler):
                     "status": res["status"],
                     "left_area": res["left_area"],
                     "right_area": res["right_area"],
+                    "left_len": res["left_len"],
+                    "right_len": res["right_len"],
                     "left_ok": res["left_ok"],
                     "right_ok": res["right_ok"],
-                    "image_base64": base64_image
+                    "image_base64": base64_image,
+                    "elapsed": elapsed
                 }
                 
                 self.send_response(200)
