@@ -450,10 +450,9 @@ HTML_PAGE = """
             color: white;
         }
 
-        /* Controls under Live stream */
         .live-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-top: 10px;
             padding: 0 5px;
@@ -715,9 +714,8 @@ HTML_PAGE = """
                 </div>
             </div>
             <div class="live-controls">
-                <div class="toggle-mode">自動檢測 (V) <span>手動檢測</span></div>
                 <button class="btn-capture" id="btn-capture">
-                    📷 擷取
+                    📤 上傳圖片
                 </button>
             </div>
         </section>
