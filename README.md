@@ -1,3 +1,5 @@
+Markdown
+
 # 🔍 接腳長度自動檢測系統 (Prong Length Detection Tool)
 
 這是一個基於 Python、OpenCV 與 AI 去背技術 (Rembg) 開發的 **AOI 自動光學檢測系統**。系統能自動辨識金屬/塑膠零件的左右接腳（Prongs），進行幾何測量並判定長度是否合格（OK / NG）。
@@ -22,7 +24,78 @@
 
 請確保您的環境已安裝 **Python 3.8+**。
 
-### 1. 複製專案
+### 1. 複製專案與下載
 ```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/No-U0720/OK_NG.git)
+git clone [https://github.com/No-U0720/OK_NG.git](https://github.com/No-U0720/OK_NG.git)
 cd OK_NG
+
+2. 安裝依賴套件
+Bash
+
+pip install numpy opencv-python pillow rembg
+
+    💡 提示：系統繪製中文標記時會優先載入 macOS 標準字體（如 STHeiti Medium 或 PingFang），若在 Linux 或 Windows 環境執行，請確保系統已安裝支援中文的字型檔。
+
+    🚀 快速啟動網頁版介面 (Web UI)
+
+    請在終端機（Terminal）中輸入以下指令，即可直接開啟網頁版上傳圖片進行檢測：
+    Bash
+
+    python3 ok_ng.py --web
+
+    執行後，系統將會自動開啟瀏覽器（預設為 http://localhost:5000），即可體驗拖曳上傳與即時 OK/NG 判定功能！
+
+🚀 更多使用說明
+1. 資料夾批次檢測 (CLI 模式) 📂
+
+檢測指定資料夾內的所有圖片（支援 .jpg, .jpeg, .png），並將結果與標記圖片輸出至指定目錄：
+Bash
+
+python3 ok_ng.py /path/to/image_folder --out ./results
+
+2. 單張圖片檢測 🖼️
+Bash
+
+python3 ok_ng.py /path/to/single_image.png --out ./results
+
+3. 互動式輸入 💬
+
+若執行時未帶入任何參數，程式將會主動提示您輸入或拖曳路徑：
+Bash
+
+python3 ok_ng.py
+
+⚙️ 檢測參數與門檻設定
+
+您可以在程式碼開頭微調以下參數以適應不同的相機距離與光線：
+Python
+
+# 接腳檢測興趣區域 (ROI: [x_start, y_start, x_end, y_end])
+LEFT_PRONG_ROI = [1120, 800, 1200, 880]
+RIGHT_PRONG_ROI = [1300, 800, 1400, 880]
+
+# 判斷門檻
+DARK_PIXEL_THRESHOLD = 100  # 灰階閥值
+LENGTH_THRESHOLD = 80       # 合格長度門檻 (像素 px)
+
+📂 專案結構
+Plaintext
+
+├── ok_ng.py           # 主程式 (包含影像處理、CLI 邏輯與 Web Server)
+├── README.md          # 專案說明文件
+└── results/           # 視覺化檢測結果輸出目錄 (執行後自動建立)
+
+📊 檢測結果範例輸出
+
+命令行批次掃描時的輸出格式如下：
+Plaintext
+
+Scanning directory: ./test_images (5 files found)
+--------------------------------------------------------------------------------
+Filename                                      | Left Length | Right Length | Status
+--------------------------------------------------------------------------------
+capture_001.jpg                               | 85 px       | 86 px        | OK    
+capture_002.jpg                               | 62 px       | 84 px        | NG    
+--------------------------------------------------------------------------------
+Scan complete. Total: 5, OK: 4, NG: 1
+Visualizations saved to: /path/to/results
