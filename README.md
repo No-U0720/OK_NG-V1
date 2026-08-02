@@ -1,6 +1,6 @@
 Markdown
 
-# 🔍 接腳長度自動檢測系統 (Prong Length Detection Tool)
+# 🔍 凸耳長度自動檢測系統 (Prong Length Detection Tool)
 
 這是一個基於 Python、OpenCV 與 AI 去背技術 (Rembg) 開發的 **AOI 自動光學檢測系統**。系統能自動辨識金屬/塑膠零件的左右接腳（Prongs），進行幾何測量並判定長度是否合格（OK / NG）。
 
