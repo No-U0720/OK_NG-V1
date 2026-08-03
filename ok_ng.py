@@ -17,7 +17,8 @@ RIGHT_PRONG_ROI = [1300, 800, 1400, 880]
 # Thresholds
 DARK_PIXEL_THRESHOLD = 100
 AREA_THRESHOLD = 1250
-LENGTH_THRESHOLD = 80
+MIN_LENGTH_THRESHOLD = 80
+MAX_LENGTH_THRESHOLD = 100
 
 def check_image(image_path_or_bytes, filename="uploaded_image.png", output_dir=None):
     """
@@ -147,8 +148,8 @@ def check_image(image_path_or_bytes, filename="uploaded_image.png", output_dir=N
                             "dist": dist
                         })
                         
-        left_ok = left_len >= LENGTH_THRESHOLD
-        right_ok = right_len >= LENGTH_THRESHOLD
+        left_ok = MIN_LENGTH_THRESHOLD <= left_len <= MAX_LENGTH_THRESHOLD
+        right_ok = MIN_LENGTH_THRESHOLD <= right_len <= MAX_LENGTH_THRESHOLD
         
         is_ok = left_ok and right_ok
         status_str = "OK" if is_ok else "NG"
@@ -191,12 +192,18 @@ def check_image(image_path_or_bytes, filename="uploaded_image.png", output_dir=N
         # Compile explanations
         reasons = []
         if is_ok:
-            reasons.append(f"兩側接腳均符合標準。左接腳長度: {left_len} px，右接腳長度: {right_len} px (標準: >= {LENGTH_THRESHOLD} px)")
+            reasons.append(f"兩側接腳均符合標準。左接腳長度: {left_len} px，右接腳長度: {right_len} px (標準: {MIN_LENGTH_THRESHOLD} ~ {MAX_LENGTH_THRESHOLD} px)")
         else:
             if not left_ok:
-                reasons.append(f"左側接腳過短 (量測長度: {left_len} px，標準: >= {LENGTH_THRESHOLD} px)")
+                if left_len < MIN_LENGTH_THRESHOLD:
+                    reasons.append(f"左側接腳過短 (量測長度: {left_len} px，標準: {MIN_LENGTH_THRESHOLD} ~ {MAX_LENGTH_THRESHOLD} px)")
+                else:
+                    reasons.append(f"左側接腳過長 (量測長度: {left_len} px，標準: {MIN_LENGTH_THRESHOLD} ~ {MAX_LENGTH_THRESHOLD} px)")
             if not right_ok:
-                reasons.append(f"右側接腳過短 (量測長度: {right_len} px，標準: >= {LENGTH_THRESHOLD} px)")
+                if right_len < MIN_LENGTH_THRESHOLD:
+                    reasons.append(f"右側接腳過短 (量測長度: {right_len} px，標準: {MIN_LENGTH_THRESHOLD} ~ {MAX_LENGTH_THRESHOLD} px)")
+                else:
+                    reasons.append(f"右側接腳過長 (量測長度: {right_len} px，標準: {MIN_LENGTH_THRESHOLD} ~ {MAX_LENGTH_THRESHOLD} px)")
                 
         for idx, reason in enumerate(reasons):
             draw.text((80, 180 + idx * 70), reason, fill=(255, 255, 255), font=font_body)
@@ -736,7 +743,7 @@ HTML_PAGE = """
                     <div class="config-red-table">
                         左側長度: <span id="val-left-len">--</span> px<br>
                         右側長度: <span id="val-right-len">--</span> px<br>
-                        設定門檻: 80.00 px<br>
+                        設定門檻: 80 ~ 100 px<br>
                         量測狀態: <span id="val-status">--</span>
                     </div>
                     <div class="config-arrow">⬅</div>
