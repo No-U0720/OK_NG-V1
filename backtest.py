@@ -24,12 +24,16 @@ def main():
         print(f"錯誤：路徑 '{dir_path}' 不存在或不是資料夾。")
         return
 
-    # 取得資料夾中所有圖片
+    # 取得資料夾中所有圖片 (支援遞迴搜尋子資料夾)
     image_extensions = ('.jpg', '.jpeg', '.png')
-    files = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.lower().endswith(image_extensions)]
+    files = []
+    for root, _, filenames_in_dir in os.walk(dir_path):
+        for f in filenames_in_dir:
+            if f.lower().endswith(image_extensions):
+                files.append(os.path.join(root, f))
     
     if not files:
-        print(f"在資料夾中找不到支援的圖片檔：{dir_path}")
+        print(f"在資料夾或其子資料夾中找不到支援的圖片檔：{dir_path}")
         return
 
     # 清空舊的輸出資料夾
